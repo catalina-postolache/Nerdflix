@@ -1,60 +1,73 @@
 import React, { Component } from 'react';
-//import Movies from './Movies.js';
 import './App.css';
 import {
   Typography,
   Grid,
   Button,
-  Table,
-  TableBody,
-  TableRow,
-  TableCell,
-  TextField,
   Card
 } from '@material-ui/core'; 
 
 import data from './imdb-top-50.json';
 
 class App extends Component {
-  constructor(props) {
+  
+  constructor (props) {
     super(props)
-    this.state = { data }
-    this.sortByPriceAsc = this.sortByPriceAsc.bind(this);
-    this.sortByPriceDesc = this.sortByPriceDesc.bind(this);
-  };
+    this.toggleListReverse = this.toggleListReverse.bind(this)
+    this.toggleSortRatings = this.toggleSortRatings.bind(this)
+    this.like = this.like.bind(this)
 
-  sortByPriceAsc() {
-    this.setState(prevState => {
-      this.state.data.data.movies.sort((a, b) => (a.rating - b.rating))
-      console.log(data.data.movies[0].rating)
-  });
+    this.state = {
+      ratings: [],
+      count: data.data.movies.votes,
+      isOldestFirst: true,
+    }
   }
 
-  sortByPriceDesc() {
-    this.setState(prevState => {
-      this.state.data.data.movies.sort((a, b) => (b.rating - a.rating))
-  });
-  } 
+  toggleSortRatings (event) {
+    this.sortByRatings()
+  }
+  toggleListReverse (event) {
+    const {ratings} = this.state
+    let newRatings = ratings.reverse()
+    this.setState({
+      ratings: newRatings
+    })
+  }
+  like() {
+    const {count} = this.state
+
+    this.setState({
+      count: count + 1
+    });
+  };
+
+  componentDidMount () {
+    const ratings = data.data.movies
+    this.setState({
+      isOldestFirst: true,
+      ratings: ratings,
+    })
+  }
 
   render() {
     return (
       <Grid>
-            <Button onClick={this.sortByPriceAsc}>
-          ASC
-        </Button>
-        <Button onClick={this.sortByPriceDesc}>
-          DESC
-        </Button>
+          <Button variant="contained"  color="primary" onClick={this.toggleListReverse}>Rating order</Button>
 
-            {data.data.movies.map((el, index) => 
-                <Card>
+            {data.data.movies.map((el) => 
+                <Card key={el.ranking}>
                     <img src={el.urlPoster} alt='no pic'/>
                     <Typography >                        
                         {el.title}
                     </Typography>
                     <Typography >
                         {el.year}
-                    </Typography>               
+                    </Typography>       
+                    <Typography >
+                        {el.votes}
+                    </Typography>    
+                    <Button variant="contained"  color="secondary" onClick={this.like}>Like</Button>     
             </Card>
             )} 
         </Grid>
